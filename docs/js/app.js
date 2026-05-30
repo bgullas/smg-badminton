@@ -263,7 +263,7 @@ function renderMembers() {
   const el=document.getElementById('members-list');
   const colors=['#1A56DB','#059669','#D97706','#7C3AED','#DB2777','#0D9488'];
   el.innerHTML=filtered.length?filtered.map((m,i)=>`
-    <div class="member-card">
+    <div class="member-card" data-mid="${i}">
       <div class="avatar" style="background:${colors[i%colors.length]}">${m.name.charAt(0).toUpperCase()}</div>
       <div class="member-info">
         <div class="member-name">${m.name}</div>
@@ -275,11 +275,38 @@ function renderMembers() {
       </div>
       ${currentUser.role==='admin'?`
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-          <button class="btn-sm btn-sm-blue" style="padding:6px 10px" onclick="openEditMember('${m.id}')">✏️</button>
-          <button class="del-btn" onclick="delMember('${m.id}','${m.name}')">✕</button>
+          <button class="btn-sm btn-sm-blue edit-member-btn" data-mid="${i}" style="padding:6px 10px">✏️</button>
+          <button class="del-btn del-member-btn" data-mid="${i}">✕</button>
         </div>`:''}
     </div>`).join('')
   :`<div class="empty"><div class="empty-icon">👥</div><p>No members found</p></div>`;
+
+  // Store filtered list on element for event handlers
+  el._filtered = filtered;
+
+  // Edit buttons
+  el.querySelectorAll('.edit-member-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const m = el._filtered[+btn.dataset.mid];
+      if (!m) return;
+      document.getElementById('em-id').value = m.id;
+      document.getElementById('em-name').value = m.name;
+      document.getElementById('em-phone').value = m.phone||'';
+      document.getElementById('em-type').value = m.type||'permanent';
+      document.getElementById('em-category').value = m.category||'competitive';
+      openSheet('sheet-edit-member');
+    });
+  });
+
+  // Delete buttons
+  el.querySelectorAll('.del-member-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const m = el._filtered[+btn.dataset.mid];
+      if (m) delMember(m.id, m.name);
+    });
+  });
 }
 document.getElementById('member-search').addEventListener('input', renderMembers);
 
@@ -308,16 +335,6 @@ async function delMember(id,name) {
     allMembers=allMembers.filter(m=>m.id!==id); renderMembers(); fillMemberSelects();
     toast('Removed','success');
   } catch(e) { toast(e.message,'error'); }
-}
-function openEditMember(id) {
-  const m = allMembers.find(m=>m.id===id);
-  if (!m) return;
-  document.getElementById('em-id').value = m.id;
-  document.getElementById('em-name').value = m.name;
-  document.getElementById('em-phone').value = m.phone||'';
-  document.getElementById('em-type').value = m.type||'permanent';
-  document.getElementById('em-category').value = m.category||'competitive';
-  openSheet('sheet-edit-member');
 }
 async function saveMemberEdit() {
   const id = document.getElementById('em-id').value;
