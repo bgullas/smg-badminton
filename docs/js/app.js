@@ -273,7 +273,11 @@ function renderMembers() {
           <span class="tag ${m.category==='competitive'?'tag-comp':'tag-pleasure'}">${m.category}</span>
         </div>
       </div>
-      ${currentUser.role==='admin'?`<button class="del-btn" onclick="delMember('${m.id}','${m.name}')">✕</button>`:''}
+      ${currentUser.role==='admin'?`
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn-sm btn-sm-blue" style="padding:6px 10px" onclick="openEditMember('${m.id}')">✏️</button>
+          <button class="del-btn" onclick="delMember('${m.id}','${m.name}')">✕</button>
+        </div>`:''}
     </div>`).join('')
   :`<div class="empty"><div class="empty-icon">👥</div><p>No members found</p></div>`;
 }
@@ -303,6 +307,32 @@ async function delMember(id,name) {
     await sPost('deleteMember',{id});
     allMembers=allMembers.filter(m=>m.id!==id); renderMembers(); fillMemberSelects();
     toast('Removed','success');
+  } catch(e) { toast(e.message,'error'); }
+}
+function openEditMember(id) {
+  const m = allMembers.find(m=>m.id===id);
+  if (!m) return;
+  document.getElementById('em-id').value = m.id;
+  document.getElementById('em-name').value = m.name;
+  document.getElementById('em-phone').value = m.phone||'';
+  document.getElementById('em-type').value = m.type||'permanent';
+  document.getElementById('em-category').value = m.category||'competitive';
+  openSheet('sheet-edit-member');
+}
+async function saveMemberEdit() {
+  const id = document.getElementById('em-id').value;
+  const name = document.getElementById('em-name').value.trim();
+  const phone = document.getElementById('em-phone').value.trim();
+  const type = document.getElementById('em-type').value;
+  const category = document.getElementById('em-category').value;
+  if (!name) return toast('Name is required','error');
+  try {
+    await sPost('updateMember',{id,name,phone,type,category});
+    const idx = allMembers.findIndex(m=>m.id===id);
+    if (idx>-1) allMembers[idx] = {...allMembers[idx],name,phone,type,category};
+    renderMembers(); fillMemberSelects();
+    closeSheet('sheet-edit-member');
+    toast('Member updated ✓','success');
   } catch(e) { toast(e.message,'error'); }
 }
 

@@ -256,6 +256,28 @@
   </div>
 </div>
 
+<!-- Edit Member -->
+<div id="sheet-edit-member" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-hdr"><span>Edit Member</span><button onclick="closeSheet('sheet-edit-member')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="em-id">
+      <div class="field-block"><label class="flabel">Full Name *</label><input type="text" id="em-name" class="finput" placeholder="e.g. John Tan"></div>
+      <div class="field-block"><label class="flabel">Phone Number</label><input type="tel" id="em-phone" class="finput" placeholder="e.g. 91234567"></div>
+      <div class="field-row">
+        <div class="field-block" style="flex:1"><label class="flabel">Type</label>
+          <select id="em-type" class="finput"><option value="permanent">Permanent</option><option value="temporary">Temporary</option></select>
+        </div>
+        <div class="field-block" style="flex:1"><label class="flabel">Category</label>
+          <select id="em-category" class="finput"><option value="competitive">Competitive</option><option value="pleasure">Pleasure</option></select>
+        </div>
+      </div>
+      <button class="action-btn blue-btn" onclick="saveMemberEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add Session -->
 <div id="sheet-session" class="overlay hidden">
   <div class="sheet">

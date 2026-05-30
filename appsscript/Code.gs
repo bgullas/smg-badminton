@@ -88,6 +88,13 @@ function doPost(e) {
       return jsonOut(row);
     }
 
+    if (a === 'updateMember') {
+      if (role !== 'admin') return jsonOut({ error: 'Admin only' });
+      return jsonOut(updateRow('members', data.id, {
+        name: data.name, phone: data.phone, type: data.type, category: data.category
+      }));
+    }
+
     if (a === 'deleteMember') {
       if (role !== 'admin') return jsonOut({ error: 'Admin only' });
       return jsonOut(deleteRow('members', data.id));
