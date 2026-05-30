@@ -231,11 +231,35 @@ function getSheetData(name) {
   if (last < 2) return [];
   var data    = sheet.getDataRange().getValues();
   var headers = data[0];
+  var tz      = Session.getScriptTimeZone();
   return data.slice(1).map(function(row) {
     var obj = {};
-    headers.forEach(function(h, i) { obj[h] = row[i] !== undefined && row[i] !== null ? String(row[i]) : ''; });
+    headers.forEach(function(h, i) {
+      var val = row[i];
+      if (val instanceof Date) {
+        if (h === 'date') {
+          obj[h] = Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+        } else if (h === 'startTime' || h === 'endTime') {
+          obj[h] = Utilities.formatDate(val, tz, 'HH:mm');
+        } else {
+          obj[h] = val.toISOString();
+        }
+      } else {
+        obj[h] = (val !== undefined && val !== null) ? String(val) : '';
+      }
+    });
     return obj;
   });
+}
+
+// ── UTILITY: clear session data, keep members ────────────────────────────────
+function clearSessionData() {
+  ['sessions','games','attendance','bookings','payments'].forEach(function(name) {
+    var sheet = getSheet(name);
+    var last  = sheet.getLastRow();
+    if (last > 1) sheet.deleteRows(2, last - 1);
+  });
+  Logger.log('Cleared sessions, games, attendance, bookings, payments. Members kept.');
 }
 
 function addRow(sheetName, rowData) {
