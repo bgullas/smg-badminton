@@ -151,8 +151,10 @@ async function preload() {
   } catch(e) { console.warn('Preload:', e.message); }
 }
 function sessionLabel(s) {
-  const d = new Date(s.date+'T00:00:00');
-  return d.toLocaleDateString('en-SG',{weekday:'short',day:'numeric',month:'short'})+' · '+s.startTime+'–'+s.endTime;
+  const dateStr = normDate(s.date);
+  const d = dateStr ? new Date(dateStr+'T00:00:00') : null;
+  const label = d ? d.toLocaleDateString('en-SG',{weekday:'short',day:'numeric',month:'short'}) : 'Unknown date';
+  return label+' · '+normTime(s.startTime)+'–'+normTime(s.endTime);
 }
 function fillSessionSelects() {
   const sorted = [...allSessions].sort((a,b)=>a.date<b.date?1:-1);
@@ -225,6 +227,8 @@ async function loadHome() {
     allSessions=sessions; allMembers=members; fillSessionSelects(); fillMemberSelects();
 
     const today = now.toISOString().slice(0,10);
+    // Normalise dates before filtering/sorting
+    sessions.forEach(s => { s.date = normDate(s.date)||s.date; s.startTime = normTime(s.startTime); s.endTime = normTime(s.endTime); });
     const upcoming = sessions.filter(s=>s.date>=today).sort((a,b)=>a.date>b.date?1:-1);
     const nxt = upcoming[0];
     const el = document.getElementById('next-session-card');
@@ -236,7 +240,7 @@ async function loadHome() {
           <div class="next-card-icon">📅</div>
           <div>
             <div class="next-card-title">Next Session</div>
-            <div class="next-card-date">${d.toLocaleDateString('en-SG',{weekday:'long',day:'numeric',month:'long'})}</div>
+            <div class="next-card-date">${isNaN(d)?nxt.date:d.toLocaleDateString('en-SG',{weekday:'long',day:'numeric',month:'long'})}</div>
             <div class="next-card-meta">${nxt.startTime}–${nxt.endTime} &nbsp;·&nbsp; ${nxt.location} &nbsp;·&nbsp; ${attCnt} attending</div>
           </div>
         </div>`;
@@ -357,8 +361,11 @@ async function saveMemberEdit() {
 function parseCourts(raw) { try{return JSON.parse(raw).filter(Boolean);}catch{return [raw].filter(Boolean);} }
 async function loadSessions() {
   if (!isConfigured()) { document.getElementById('sessions-list').innerHTML = notConfiguredMsg(); return; }
-  try { allSessions=await sGet('getSessions'); fillSessionSelects(); renderSessions(); }
-  catch(e) { toast(e.message,'error'); }
+  try {
+    const raw=await sGet('getSessions');
+    raw.forEach(s=>{ s.date=normDate(s.date)||s.date; s.startTime=normTime(s.startTime); s.endTime=normTime(s.endTime); });
+    allSessions=raw; fillSessionSelects(); renderSessions();
+  } catch(e) { toast(e.message,'error'); }
 }
 function renderSessions() {
   const sorted=[...allSessions].sort((a,b)=>a.date<b.date?1:-1);
@@ -753,6 +760,30 @@ async function loadRPayments() {
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function fmtTime(iso) { try{return new Date(iso).toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit'});}catch{return '';} }
 function fmtDateTime(iso) { try{return new Date(iso).toLocaleString('en-SG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return '';} }
+
+// Normalise a date value coming from Sheets — handles YYYY-MM-DD strings,
+// full JS Date strings (e.g. "Sat Dec 30 1899 …"), and ISO strings.
+function normDate(raw) {
+  if (!raw) return null;
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0,10);
+  // Full JS Date string from Sheets — extract the real date via Date parse
+  const d = new Date(raw);
+  if (isNaN(d)) return null;
+  // getFullYear etc. on a 1899 date means Sheets returned a time-only value
+  // stored as a fractional day from Dec 30 1899 — treat as today's date
+  if (d.getFullYear() < 1990) return null;
+  return d.toISOString().slice(0,10);
+}
+
+// Normalise a time value — handles HH:MM strings and full Date strings.
+function normTime(raw) {
+  if (!raw) return '';
+  if (/^\d{1,2}:\d{2}$/.test(raw)) return raw;
+  const d = new Date(raw);
+  if (isNaN(d)) return raw;
+  return d.toLocaleTimeString('en-SG',{hour:'2-digit',minute:'2-digit',hour12:false});
+}
 
 // Fix the greeting template literal issue
 (function fixGreeting(){
