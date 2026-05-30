@@ -88,6 +88,7 @@ function goTo(page, push=true) {
   document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
   const isSub = SUB_PAGES.includes(page);
   document.getElementById('back-btn').classList.toggle('hidden', !isSub);
+  document.getElementById('logout-btn').classList.toggle('hidden', isSub);
   if (push && isSub) pageStack.push(currentPage);
   currentPage = page;
   // bottom nav highlight
@@ -117,8 +118,11 @@ document.getElementById('login-form').addEventListener('submit', e => {
   else document.getElementById('login-error').textContent = 'Invalid username or password';
 });
 function save() { localStorage.setItem('smg_u', JSON.stringify(currentUser)); }
-document.getElementById('logout-btn') && document.getElementById('logout-btn').addEventListener('click', () => {
-  localStorage.removeItem('smg_u'); location.reload();
+document.getElementById('logout-btn').addEventListener('click', () => {
+  if (confirm('Log out of SMG Badminton?')) {
+    localStorage.removeItem('smg_u');
+    location.reload();
+  }
 });
 
 function boot() {
