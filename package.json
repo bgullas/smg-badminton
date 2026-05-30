@@ -1,8 +1,8 @@
 {
   "name": "smg-badminton",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "SMG Badminton Club management PWA",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/index.js"
@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
