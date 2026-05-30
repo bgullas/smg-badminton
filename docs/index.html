@@ -3,34 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SMG Badminton">
-<meta name="theme-color" content="#1e2a3a">
+<meta name="theme-color" content="#1A56DB">
 <title>SMG Badminton Club</title>
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<link rel="stylesheet" href="/css/style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-wrap">
-    <div class="login-logo">🏸</div>
-    <h1>SMG Badminton Club</h1>
-    <p class="login-sub">Sengkang Marsiling Group</p>
+  <div class="login-top"></div>
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-icon">🏸</div>
+      <h1>SMG Badminton</h1>
+      <p>Sengkang Marsiling Group</p>
+    </div>
     <form id="login-form">
-      <div class="field">
-        <label>Username</label>
-        <input type="text" id="login-user" placeholder="Enter username" autocomplete="username">
+      <div class="input-group">
+        <span class="ig-icon">👤</span>
+        <input type="text" id="login-user" placeholder="Username" autocapitalize="none">
       </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="login-pass" placeholder="Enter password" autocomplete="current-password">
+      <div class="input-group">
+        <span class="ig-icon">🔒</span>
+        <input type="password" id="login-pass" placeholder="Password">
       </div>
-      <button type="submit" class="btn-primary full">Login</button>
+      <button type="submit" class="login-btn">Sign In</button>
       <div id="login-error"></div>
     </form>
   </div>
@@ -38,340 +40,281 @@
 
 <!-- APP -->
 <div id="app" class="hidden">
+  <div class="safe-top"></div>
 
-  <!-- Top Header -->
-  <header class="app-header">
-    <button id="back-btn" class="header-icon hidden">&#8592;</button>
-    <h1 id="page-title">Dashboard</h1>
-    <button id="header-action" class="header-icon hidden"></button>
+  <!-- Header -->
+  <header class="hdr" id="hdr">
+    <button id="back-btn" class="hdr-btn hidden">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+    </button>
+    <span id="page-title" class="hdr-title">Home</span>
+    <button id="hdr-plus" class="hdr-btn hidden" onclick="onHeaderPlus()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
   </header>
 
-  <!-- Page Container -->
-  <div class="page-container" id="page-container">
+  <!-- Pages -->
+  <div class="pages" id="pages">
 
-    <!-- DASHBOARD -->
-    <div id="page-dashboard" class="page">
-      <div class="hero-banner">
-        <div class="hero-icon">🏸</div>
-        <div class="hero-text">
-          <div class="hero-title">SMG Badminton</div>
-          <div class="hero-sub" id="hero-date"></div>
+    <!-- HOME -->
+    <div id="pg-home" class="pg">
+      <div class="home-hero">
+        <div>
+          <div class="home-greeting" id="home-greeting">Hello!</div>
+          <div class="home-role" id="home-role"></div>
+          <div class="home-date" id="home-date"></div>
         </div>
+        <div class="home-badge">🏸</div>
       </div>
-      <div class="section-title">Upcoming Sessions</div>
-      <div id="dashboard-sessions"></div>
-      <div class="stats-row" id="dashboard-stats"></div>
+      <div id="next-session-card"></div>
+      <div class="section-label">Quick Actions</div>
+      <div class="app-grid" id="app-grid"></div>
+      <div class="section-label" style="margin-top:4px">Club Overview</div>
+      <div class="stats-row" id="stats-row"></div>
     </div>
 
-    <!-- MEMBERS (admin) -->
-    <div id="page-members" class="page hidden">
-      <div class="toolbar">
-        <input type="text" id="member-search" class="search-input" placeholder="Search members…">
-        <button class="btn-primary" onclick="showModal('modal-add-member')">+ Add</button>
+    <!-- MEMBERS -->
+    <div id="pg-members" class="pg hidden">
+      <div class="searchbar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="member-search" placeholder="Search members…">
       </div>
       <div id="members-list"></div>
     </div>
 
-    <!-- SCHEDULE (admin) -->
-    <div id="page-schedule" class="page hidden">
-      <div class="toolbar">
-        <span class="section-label">Game Sessions</span>
-        <button class="btn-primary" onclick="showModal('modal-add-session')">+ New</button>
-      </div>
+    <!-- SCHEDULE -->
+    <div id="pg-schedule" class="pg hidden">
       <div id="sessions-list"></div>
     </div>
 
-    <!-- GAMES (admin) -->
-    <div id="page-games" class="page hidden">
-      <div class="toolbar">
-        <select id="games-session-filter" class="select-input">
-          <option value="">Select a session…</option>
+    <!-- GAMES -->
+    <div id="pg-games" class="pg hidden">
+      <div class="field-block">
+        <select id="games-session-sel" class="sel" onchange="loadGames()">
+          <option value="">— Select a session —</option>
         </select>
-        <button class="btn-primary" id="add-game-btn" onclick="openAddGame()" style="display:none">+ Game</button>
       </div>
       <div id="games-list"></div>
     </div>
 
-    <!-- MY ATTENDANCE (member) -->
-    <div id="page-attendance" class="page hidden">
-      <div class="info-card">
-        <div class="info-icon">✅</div>
-        <div class="info-text">Confirm you will attend a game session</div>
+    <!-- ATTENDANCE -->
+    <div id="pg-attendance" class="pg hidden">
+      <div class="info-bar green">
+        <span>✅</span><span>Confirm you will attend a session</span>
       </div>
-      <div class="field">
-        <label>Select Session</label>
-        <select id="att-session" class="select-input"></select>
+      <div class="field-block"><label class="flabel">Select Session</label>
+        <select id="att-session" class="sel" onchange="onAttSessionChange()"><option value="">— Select session —</option></select>
       </div>
-      <div class="field">
-        <label>Your Name</label>
-        <select id="att-member" class="select-input"></select>
+      <div class="field-block"><label class="flabel">Your Name</label>
+        <select id="att-member" class="sel"><option value="">— Select your name —</option></select>
       </div>
-      <button class="btn-success full" onclick="submitAttendance()">✅ Confirm Attendance</button>
-      <div class="section-title" style="margin-top:24px">Confirmed for this session</div>
-      <div id="att-confirmed-list"></div>
+      <button class="action-btn green-btn" onclick="submitAttendance()">✅ &nbsp;Confirm Attendance</button>
+      <div class="list-label hidden" id="att-label">Who's Attending</div>
+      <div id="att-list"></div>
     </div>
 
-    <!-- MY BOOKING (member) -->
-    <div id="page-booking" class="page hidden">
-      <div class="info-card">
-        <div class="info-icon">🔖</div>
-        <div class="info-text">Confirm you have booked at ActiveSG website</div>
+    <!-- BOOKING -->
+    <div id="pg-booking" class="pg hidden">
+      <div class="info-bar blue">
+        <span>🔖</span><span>Confirm your ActiveSG booking</span>
       </div>
-      <div class="field">
-        <label>Select Session</label>
-        <select id="book-session" class="select-input"></select>
+      <div class="field-block"><label class="flabel">Select Session</label>
+        <select id="book-session" class="sel" onchange="onBookSessionChange()"><option value="">— Select session —</option></select>
       </div>
-      <div class="field">
-        <label>Your Name</label>
-        <select id="book-member" class="select-input"></select>
+      <div class="field-block"><label class="flabel">Your Name</label>
+        <select id="book-member" class="sel"><option value="">— Select your name —</option></select>
       </div>
-      <button class="btn-primary full" onclick="submitBooking()">🔖 Confirm Booking</button>
-      <div class="section-title" style="margin-top:24px">Booked for this session</div>
-      <div id="book-confirmed-list"></div>
+      <button class="action-btn blue-btn" onclick="submitBooking()">🔖 &nbsp;Confirm Booking</button>
+      <div class="list-label hidden" id="book-label">Booked Members</div>
+      <div id="book-list"></div>
     </div>
 
-    <!-- PAYMENTS (admin) -->
-    <div id="page-payments" class="page hidden">
-      <div class="field">
-        <label>Select Session</label>
-        <select id="pay-session" class="select-input" onchange="loadPaymentSession()"></select>
+    <!-- PAYMENTS -->
+    <div id="pg-payments" class="pg hidden">
+      <div class="field-block"><label class="flabel">Select Session</label>
+        <select id="pay-session" class="sel" onchange="loadPaymentPage()"><option value="">— Select session —</option></select>
       </div>
-      <div id="pay-member-list"></div>
+      <div id="pay-list"></div>
     </div>
 
     <!-- REPORTS HUB -->
-    <div id="page-reports" class="page hidden">
-      <div class="report-grid">
-        <div class="report-card" onclick="navigateTo('report-attendance')">
-          <div class="report-icon">👥</div>
-          <div class="report-name">Attendance</div>
-          <div class="report-desc">Who registered for each session</div>
-        </div>
-        <div class="report-card" onclick="navigateTo('report-bookings')">
-          <div class="report-icon">🔖</div>
-          <div class="report-name">Bookings</div>
-          <div class="report-desc">ActiveSG booking status</div>
-        </div>
-        <div class="report-card" onclick="navigateTo('report-results')">
-          <div class="report-icon">🎯</div>
-          <div class="report-name">Game Results</div>
-          <div class="report-desc">Scores by date</div>
-        </div>
-        <div class="report-card" onclick="navigateTo('report-players')">
-          <div class="report-icon">📈</div>
-          <div class="report-name">Player Stats</div>
-          <div class="report-desc">Win/loss per player</div>
-        </div>
-        <div class="report-card" onclick="navigateTo('report-teams')">
-          <div class="report-icon">🤝</div>
-          <div class="report-name">Team History</div>
-          <div class="report-desc">Pair performance</div>
-        </div>
-        <div class="report-card admin-only" onclick="navigateTo('report-payments')">
-          <div class="report-icon">💰</div>
-          <div class="report-name">Payment Status</div>
-          <div class="report-desc">Paid vs unpaid</div>
-        </div>
-      </div>
+    <div id="pg-reports" class="pg hidden">
+      <div class="report-grid" id="report-grid"></div>
     </div>
 
     <!-- REPORT: ATTENDANCE -->
-    <div id="page-report-attendance" class="page hidden">
-      <div class="field">
-        <label>Select Session</label>
-        <select id="ratt-session" class="select-input" onchange="loadReportAttendance()"></select>
-      </div>
+    <div id="pg-ratt" class="pg hidden">
+      <div class="field-block"><select id="ratt-session" class="sel" onchange="loadRAttendance()"><option value="">— Select session —</option></select></div>
       <div id="ratt-content"></div>
     </div>
 
     <!-- REPORT: BOOKINGS -->
-    <div id="page-report-bookings" class="page hidden">
-      <div class="field">
-        <label>Select Session</label>
-        <select id="rbook-session" class="select-input" onchange="loadReportBookings()"></select>
-      </div>
+    <div id="pg-rbook" class="pg hidden">
+      <div class="field-block"><select id="rbook-session" class="sel" onchange="loadRBookings()"><option value="">— Select session —</option></select></div>
       <div id="rbook-content"></div>
     </div>
 
     <!-- REPORT: RESULTS -->
-    <div id="page-report-results" class="page hidden">
-      <div class="field">
-        <label>Select Session</label>
-        <select id="rres-session" class="select-input" onchange="loadReportResults()"></select>
-      </div>
+    <div id="pg-rresults" class="pg hidden">
+      <div class="field-block"><select id="rres-session" class="sel" onchange="loadRResults()"><option value="">— Select session —</option></select></div>
       <div id="rres-content"></div>
     </div>
 
     <!-- REPORT: PLAYER STATS -->
-    <div id="page-report-players" class="page hidden">
+    <div id="pg-rplayers" class="pg hidden">
       <div id="rplayer-content"></div>
     </div>
 
     <!-- REPORT: TEAM HISTORY -->
-    <div id="page-report-teams" class="page hidden">
-      <div class="field">
-        <label>Player 1</label>
-        <select id="rteam-p1" class="select-input"></select>
+    <div id="pg-rteams" class="pg hidden">
+      <div class="field-block"><label class="flabel">Player 1</label>
+        <select id="rteam-p1" class="sel"></select>
       </div>
-      <div class="field">
-        <label>Player 2 (optional)</label>
-        <select id="rteam-p2" class="select-input"></select>
+      <div class="field-block"><label class="flabel">Player 2 (optional)</label>
+        <select id="rteam-p2" class="sel"></select>
       </div>
-      <button class="btn-primary full" onclick="loadReportTeams()">View History</button>
+      <button class="action-btn blue-btn" onclick="loadRTeams()">🔍 &nbsp;Search Games</button>
       <div id="rteam-content" style="margin-top:16px"></div>
     </div>
 
     <!-- REPORT: PAYMENTS -->
-    <div id="page-report-payments" class="page hidden">
-      <div class="field">
-        <label>Select Session</label>
-        <select id="rpay-session" class="select-input" onchange="loadReportPayments()"></select>
-      </div>
+    <div id="pg-rpayments" class="pg hidden">
+      <div class="field-block"><select id="rpay-session" class="sel" onchange="loadRPayments()"><option value="">— Select session —</option></select></div>
       <div id="rpay-content"></div>
     </div>
 
-  </div><!-- end page-container -->
+  </div><!-- /pages -->
 
   <!-- Bottom Nav -->
-  <nav class="bottom-nav" id="bottom-nav">
-    <button class="nav-item active" data-page="dashboard">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">Home</span>
+  <nav class="bnav" id="bnav">
+    <button class="ntab active" data-pg="home">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <span>Home</span>
     </button>
-    <button class="nav-item admin-only" data-page="members">
-      <span class="nav-icon">👥</span>
-      <span class="nav-label">Members</span>
+    <button class="ntab admin-tab" data-pg="members">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Members</span>
     </button>
-    <button class="nav-item admin-only" data-page="schedule">
-      <span class="nav-icon">📅</span>
-      <span class="nav-label">Schedule</span>
+    <button class="ntab admin-tab" data-pg="schedule">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Schedule</span>
     </button>
-    <button class="nav-item" data-page="attendance">
-      <span class="nav-icon">✅</span>
-      <span class="nav-label">Attend</span>
+    <button class="ntab" data-pg="attendance">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9,11 12,14 22,4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Attend</span>
     </button>
-    <button class="nav-item" data-page="booking">
-      <span class="nav-icon">🔖</span>
-      <span class="nav-label">Booking</span>
+    <button class="ntab" data-pg="booking">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span>Booking</span>
     </button>
-    <button class="nav-item admin-only" data-page="games">
-      <span class="nav-icon">🏆</span>
-      <span class="nav-label">Games</span>
+    <button class="ntab admin-tab" data-pg="games">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span>Games</span>
     </button>
-    <button class="nav-item admin-only" data-page="payments">
-      <span class="nav-icon">💰</span>
-      <span class="nav-label">Payments</span>
+    <button class="ntab admin-tab" data-pg="payments">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Payments</span>
     </button>
-    <button class="nav-item" data-page="reports">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">Reports</span>
+    <button class="ntab" data-pg="reports">
+      <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reports</span>
     </button>
   </nav>
-</div>
 
-<!-- MODALS -->
+</div><!-- /app -->
+
+<!-- BOTTOM SHEET MODALS -->
 
 <!-- Add Member -->
-<div id="modal-add-member" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3>Add Member</h3>
-    <div class="field"><label>Full Name</label><input type="text" id="m-name" placeholder="e.g. John Lim"></div>
-    <div class="field"><label>Phone</label><input type="tel" id="m-phone" placeholder="e.g. 91234567"></div>
-    <div class="field">
-      <label>Type</label>
-      <select id="m-type">
-        <option value="permanent">Permanent</option>
-        <option value="temporary">Temporary</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Category</label>
-      <select id="m-category">
-        <option value="competitive">Competitive</option>
-        <option value="pleasure">Pleasure</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="hideModal('modal-add-member')">Cancel</button>
-      <button class="btn-primary" onclick="addMember()">Add Member</button>
+<div id="sheet-member" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-hdr"><span>Add Member</span><button onclick="closeSheet('sheet-member')">✕</button></div>
+    <div class="sheet-body">
+      <div class="field-block"><label class="flabel">Full Name *</label><input type="text" id="m-name" class="finput" placeholder="e.g. John Tan"></div>
+      <div class="field-block"><label class="flabel">Phone Number</label><input type="tel" id="m-phone" class="finput" placeholder="e.g. 91234567"></div>
+      <div class="field-row">
+        <div class="field-block" style="flex:1"><label class="flabel">Type</label>
+          <select id="m-type" class="finput"><option value="permanent">Permanent</option><option value="temporary">Temporary</option></select>
+        </div>
+        <div class="field-block" style="flex:1"><label class="flabel">Category</label>
+          <select id="m-category" class="finput"><option value="competitive">Competitive</option><option value="pleasure">Pleasure</option></select>
+        </div>
+      </div>
+      <button class="action-btn blue-btn" onclick="addMember()">Add Member</button>
     </div>
   </div>
 </div>
 
 <!-- Add Session -->
-<div id="modal-add-session" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3>New Game Session</h3>
-    <div class="field"><label>Date</label><input type="date" id="s-date"></div>
-    <div class="field-row">
-      <div class="field"><label>Start Time</label><input type="time" id="s-start" value="07:00"></div>
-      <div class="field"><label>End Time</label><input type="time" id="s-end" value="09:00"></div>
-    </div>
-    <div class="field">
-      <label>Location</label>
-      <input type="text" id="s-location" value="Yio Chu Kang Sports Hall">
-    </div>
-    <div class="field">
-      <label>Courts</label>
-      <div id="courts-container">
-        <div class="court-row"><input type="text" class="court-input" placeholder="Court 1 e.g. Court 5"></div>
-        <div class="court-row"><input type="text" class="court-input" placeholder="Court 2 e.g. Court 6"></div>
+<div id="sheet-session" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-hdr"><span>New Game Session</span><button onclick="closeSheet('sheet-session')">✕</button></div>
+    <div class="sheet-body">
+      <div class="field-block"><label class="flabel">Date *</label><input type="date" id="s-date" class="finput"></div>
+      <div class="field-row">
+        <div class="field-block" style="flex:1"><label class="flabel">Start</label><input type="time" id="s-start" class="finput" value="07:00"></div>
+        <div class="field-block" style="flex:1"><label class="flabel">End</label><input type="time" id="s-end" class="finput" value="09:00"></div>
       </div>
-      <button class="add-court-btn" onclick="addCourt()" id="add-court-btn">+ Add Court</button>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="hideModal('modal-add-session')">Cancel</button>
-      <button class="btn-primary" onclick="addSession()">Create Session</button>
+      <div class="field-block"><label class="flabel">Location</label><input type="text" id="s-location" class="finput" value="Yio Chu Kang Sports Hall"></div>
+      <div class="field-block">
+        <label class="flabel">Courts (2 default, max 5)</label>
+        <div id="courts-container">
+          <div class="court-row"><input type="text" class="finput court-input" placeholder="e.g. Court 5"><button class="court-del hidden" onclick="removeCourt(this)">✕</button></div>
+          <div class="court-row"><input type="text" class="finput court-input" placeholder="e.g. Court 6"><button class="court-del hidden" onclick="removeCourt(this)">✕</button></div>
+        </div>
+        <button class="add-court-btn" id="add-court-btn" onclick="addCourt()">＋ Add Court</button>
+      </div>
+      <button class="action-btn blue-btn" onclick="addSession()">Create Session</button>
     </div>
   </div>
 </div>
 
 <!-- Add Game -->
-<div id="modal-add-game" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3>Add Game</h3>
-    <div class="team-label">🔵 Team A</div>
-    <div class="field-row">
-      <div class="field"><label>Player 1</label><select id="g-a1" class="select-input"></select></div>
-      <div class="field"><label>Player 2</label><select id="g-a2" class="select-input"></select></div>
-    </div>
-    <div class="team-label">🔴 Team B</div>
-    <div class="field-row">
-      <div class="field"><label>Player 1</label><select id="g-b1" class="select-input"></select></div>
-      <div class="field"><label>Player 2</label><select id="g-b2" class="select-input"></select></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="hideModal('modal-add-game')">Cancel</button>
-      <button class="btn-primary" onclick="addGame()">Add Game</button>
-    </div>
-  </div>
-</div>
-
-<!-- Score Entry -->
-<div id="modal-score" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3>Enter Score</h3>
-    <div id="score-game-info" style="margin-bottom:16px;color:#5f6368;font-size:14px"></div>
-    <div class="field-row">
-      <div class="field"><label id="score-label-a">Team A</label><input type="number" id="score-a" min="0" max="30" placeholder="0"></div>
-      <div class="vs-divider">VS</div>
-      <div class="field"><label id="score-label-b">Team B</label><input type="number" id="score-b" min="0" max="30" placeholder="0"></div>
-    </div>
-    <input type="hidden" id="score-game-id">
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="hideModal('modal-score')">Cancel</button>
-      <button class="btn-primary" onclick="submitScore()">Save Score</button>
+<div id="sheet-game" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-hdr"><span>Add Game</span><button onclick="closeSheet('sheet-game')">✕</button></div>
+    <div class="sheet-body">
+      <div class="team-block blue-block">
+        <div class="team-title">🔵 Team A</div>
+        <div class="field-row">
+          <div class="field-block" style="flex:1"><label class="flabel">Player 1</label><select id="g-a1" class="finput"></select></div>
+          <div class="field-block" style="flex:1"><label class="flabel">Player 2</label><select id="g-a2" class="finput"></select></div>
+        </div>
+      </div>
+      <div class="vs-bar">VS</div>
+      <div class="team-block red-block">
+        <div class="team-title">🔴 Team B</div>
+        <div class="field-row">
+          <div class="field-block" style="flex:1"><label class="flabel">Player 1</label><select id="g-b1" class="finput"></select></div>
+          <div class="field-block" style="flex:1"><label class="flabel">Player 2</label><select id="g-b2" class="finput"></select></div>
+        </div>
+      </div>
+      <button class="action-btn blue-btn" style="margin-top:8px" onclick="addGame()">Add Game</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- Score -->
+<div id="sheet-score" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-pill"></div>
+    <div class="sheet-hdr"><span>Enter Score</span><button onclick="closeSheet('sheet-score')">✕</button></div>
+    <div class="sheet-body">
+      <div class="score-entry">
+        <div class="score-side"><div class="score-label" id="score-name-a">Team A</div><input type="number" id="score-a" class="score-input" min="0" max="30" placeholder="0"></div>
+        <div class="score-vs">–</div>
+        <div class="score-side"><div class="score-label" id="score-name-b">Team B</div><input type="number" id="score-b" class="score-input" min="0" max="30" placeholder="0"></div>
+      </div>
+      <input type="hidden" id="score-game-id">
+      <button class="action-btn blue-btn" onclick="submitScore()">Save Score</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
-
-<script src="/js/app.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
