@@ -132,6 +132,8 @@ function boot() {
   document.querySelectorAll('.admin-tab').forEach(el => {
     if (!el.classList.contains('itab-content')) el.style.display = isAdmin?'':'none';
   });
+  const addMemberBtn = document.getElementById('add-member-btn');
+  if (addMemberBtn) addMemberBtn.style.display = isAdmin ? '' : 'none';
   preload(); goTo('home', false);
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }

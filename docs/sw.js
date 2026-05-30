@@ -1,4 +1,4 @@
-const CACHE = 'smg-v6';
+const CACHE = 'smg-v7';
 const ASSETS = ['/', '/css/style.css', '/js/app.js', '/manifest.json'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
