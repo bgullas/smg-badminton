@@ -259,10 +259,11 @@ html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-fam
 select.sel,select.finput{cursor:pointer}
 
 /* ── INNER TABS ── */
-.inner-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px;border:1px solid var(--border)}
-.itab{flex:1;padding:9px 4px;border:none;background:none;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.inner-tabs{display:flex;width:100%;background:var(--card);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px;border:1px solid var(--border);box-sizing:border-box}
+.itab{flex:1;min-width:0;padding:9px 2px;border:none;background:none;border-radius:9px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:normal;word-break:keep-all;text-align:center;line-height:1.3}
 .itab.active{background:var(--blue);color:#fff}
-.itab-content.hidden{display:none}
+.itab-content{display:none}
+.itab-content.active-tab{display:block}
 
 /* ── NAV FIX — even 5/6 tabs, no overflow ── */
 .bnav{overflow-x:hidden}
@@ -270,6 +271,6 @@ select.sel,select.finput{cursor:pointer}
 .ntab span{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 
 /* ── WIDTH FIX ── */
-#app,.pages,.pg{max-width:100vw;overflow-x:hidden}
+html,body,#app,.pages,.pg{width:100%;max-width:100vw;overflow-x:hidden}
 .field-row{flex-wrap:wrap}
 .field-row .field-block{min-width:120px}

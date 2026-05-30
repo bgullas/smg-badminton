@@ -38,9 +38,9 @@ let currentInnerTab = 'schedule';
 function switchInnerTab(tab) {
   currentInnerTab = tab;
   document.querySelectorAll('.itab').forEach(t => t.classList.toggle('active', t.dataset.itab === tab));
-  document.querySelectorAll('.itab-content').forEach(c => c.classList.add('hidden'));
+  document.querySelectorAll('.itab-content').forEach(c => c.classList.remove('active-tab'));
   const el = document.getElementById('itab-' + tab);
-  if (el) el.classList.remove('hidden');
+  if (el) el.classList.add('active-tab');
   // header + button
   const plusTabs = {schedule: true, games: true};
   document.getElementById('hdr-plus').classList.toggle('hidden', !plusTabs[tab]);
@@ -125,7 +125,9 @@ function boot() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   const isAdmin = currentUser.role==='admin';
-  document.querySelectorAll('.admin-tab').forEach(el => el.style.display = isAdmin?'':'none');
+  document.querySelectorAll('.admin-tab').forEach(el => {
+    if (!el.classList.contains('itab-content')) el.style.display = isAdmin?'':'none';
+  });
   preload(); goTo('home', false);
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
