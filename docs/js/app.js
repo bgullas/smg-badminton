@@ -26,13 +26,29 @@ let currentUser = null, currentPage = 'home', pageStack = [];
 let allMembers = [], allSessions = [], courtCount = 2;
 
 const PAGE_TITLES = {
-  home:'Home', members:'Members', schedule:'Schedule', games:'Tournament Games',
-  attendance:'My Attendance', booking:'ActiveSG Booking', payments:'Payments',
-  reports:'Reports', ratt:'Attendance Report', rbook:'Bookings Report',
+  home:'Home', members:'Members', sessions:'Sessions', booking:'ActiveSG Booking',
+  payments:'Payments', reports:'Reports', ratt:'Attendance Report', rbook:'Bookings Report',
   rresults:'Game Results', rplayers:'Player Stats', rteams:'Team History', rpayments:'Payment Report'
 };
 
 const SUB_PAGES = ['ratt','rbook','rresults','rplayers','rteams','rpayments'];
+
+// ── INNER TABS (Sessions page) ────────────────────────────────────────────
+let currentInnerTab = 'schedule';
+function switchInnerTab(tab) {
+  currentInnerTab = tab;
+  document.querySelectorAll('.itab').forEach(t => t.classList.toggle('active', t.dataset.itab === tab));
+  document.querySelectorAll('.itab-content').forEach(c => c.classList.add('hidden'));
+  const el = document.getElementById('itab-' + tab);
+  if (el) el.classList.remove('hidden');
+  // header + button
+  const plusTabs = {schedule: true, games: true};
+  document.getElementById('hdr-plus').classList.toggle('hidden', !plusTabs[tab]);
+  // load content
+  if (tab === 'schedule') loadSessions();
+  else if (tab === 'attend') loadAttendancePage();
+  else if (tab === 'games') loadGames();
+}
 
 // ── APPS SCRIPT API ──────────────────────────────────────────────────────
 async function sGet(action, params={}) {
@@ -85,8 +101,10 @@ document.getElementById('back-btn').addEventListener('click', () => goTo(pageSta
 document.querySelectorAll('.ntab').forEach(t => t.addEventListener('click', () => goTo(t.dataset.pg)));
 function onHeaderPlus() {
   if (currentPage==='members') openSheet('sheet-member');
-  else if (currentPage==='schedule') openSheet('sheet-session');
-  else if (currentPage==='games') openAddGame();
+  else if (currentPage==='sessions') {
+    if (currentInnerTab==='schedule') openSheet('sheet-session');
+    else if (currentInnerTab==='games') openAddGame();
+  }
 }
 
 // ── AUTH ─────────────────────────────────────────────────────────────────
@@ -149,10 +167,12 @@ function fillMemberSelects() {
 // ── PAGE LOADER ───────────────────────────────────────────────────────────
 function loadPage(p) {
   const map = {
-    home:loadHome, members:loadMembers, schedule:loadSessions,
-    games:()=>{}, attendance:loadAttendancePage, booking:loadBookingPage,
-    payments:loadPaymentPage, ratt:loadRAttendance, rbook:loadRBookings,
-    rresults:loadRResults, rplayers:loadRPlayers, reports:buildReportGrid
+    home:loadHome, members:loadMembers,
+    sessions:() => switchInnerTab(currentInnerTab),
+    booking:loadBookingPage, payments:loadPaymentPage,
+    ratt:loadRAttendance, rbook:loadRBookings,
+    rresults:loadRResults, rplayers:loadRPlayers,
+    reports:buildReportGrid
   };
   if(map[p]) map[p]();
 }
@@ -176,16 +196,16 @@ async function loadHome() {
   const grid = [
     ...(isAdmin?[
       {icon:'👥',label:'Members',color:'#1A56DB',bg:'#EBF5FF',page:'members'},
-      {icon:'📅',label:'Schedule',color:'#059669',bg:'#ECFDF5',page:'schedule'},
-      {icon:'🏆',label:'Games',color:'#D97706',bg:'#FFFBEB',page:'games'},
       {icon:'💰',label:'Payments',color:'#7C3AED',bg:'#F5F3FF',page:'payments'},
     ]:[]),
-    {icon:'✅',label:'Attendance',color:'#059669',bg:'#ECFDF5',page:'attendance'},
+    {icon:'📅',label:'Sessions',color:'#059669',bg:'#ECFDF5',page:'sessions'},
+    {icon:'✅',label:'Attend',color:'#059669',bg:'#ECFDF5',page:'sessions',itab:'attend'},
+    {icon:'🏆',label:'Games',color:'#D97706',bg:'#FFFBEB',page:'sessions',itab:'games'},
     {icon:'🔖',label:'Booking',color:'#1A56DB',bg:'#EBF5FF',page:'booking'},
     {icon:'📊',label:'Reports',color:'#DB2777',bg:'#FDF2F8',page:'reports'},
   ];
   document.getElementById('app-grid').innerHTML = grid.map(g=>`
-    <button class="app-icon-btn" onclick="goTo('${g.page}')">
+    <button class="app-icon-btn" onclick="${g.itab ? `goTo('${g.page}');switchInnerTab('${g.itab}')` : `goTo('${g.page}')`}">
       <div class="icon-wrap" style="background:${g.bg};color:${g.color}">${g.icon}</div>
       <span class="icon-label">${g.label}</span>
     </button>`).join('');
