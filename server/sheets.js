@@ -1,5 +1,6 @@
 const { google } = require('googleapis');
 const path = require('path');
+const fs = require('fs');
 
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
@@ -16,10 +17,24 @@ let sheetsClient = null;
 
 async function getClient() {
   if (sheetsClient) return sheetsClient;
+
+  let credentials;
+
+  // 1. Prefer env var (Render / any hosted platform)
+  if (process.env.GOOGLE_CREDENTIALS_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  }
+  // 2. Fall back to local credentials.json file (local dev)
+  else {
+    const keyFile = path.resolve(process.env.GOOGLE_SERVICE_ACCOUNT_KEY || './credentials.json');
+    credentials = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
+  }
+
   const auth = new google.auth.GoogleAuth({
-    keyFile: path.resolve(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+    credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
+
   sheetsClient = google.sheets({ version: 'v4', auth });
   return sheetsClient;
 }
