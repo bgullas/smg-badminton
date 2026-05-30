@@ -504,12 +504,18 @@ async function loadPaymentPage() {
   if(!sessionId) { el.innerHTML=''; return; }
   const session=allSessions.find(s=>s.id===sessionId);
   try {
-    const payments=(await sGet('getPayments',{date:session?.date||''})).filter(p=>p.sessionId===sessionId);
-    const paidIds=new Set(payments.map(p=>p.memberId));
-    el.innerHTML=`<div class="section-label" style="margin-bottom:10px">Payment Status</div>`+
-      allMembers.map(m=>{
+    // Always fetch fresh members and payments together
+    const [members, payments] = await Promise.all([
+      sGet('getMembers'),
+      sGet('getPayments',{date:session?.date||''})
+    ]);
+    allMembers = members; fillMemberSelects();
+    const sessionPayments = payments.filter(p=>p.sessionId===sessionId);
+    const paidIds=new Set(sessionPayments.map(p=>p.memberId));
+    el.innerHTML=`<div class="section-label" style="margin-bottom:10px">Payment Status (${sessionPayments.length}/${allMembers.length} paid)</div>`+
+      allMembers.sort((a,b)=>a.name.localeCompare(b.name)).map(m=>{
         const paid=paidIds.has(m.id);
-        const rec=payments.find(p=>p.memberId===m.id);
+        const rec=sessionPayments.find(p=>p.memberId===m.id);
         return `<div class="pay-row">
           <div><div class="pay-name">${m.name}</div>${paid?`<div style="font-size:12px;color:var(--muted)">${fmtDateTime(rec.paidAt)}</div>`:''}</div>
           ${paid?`<span class="chip-yes">✓ Paid</span>`:`<button class="btn-sm btn-sm-green" onclick="markPaid('${sessionId}','${session?.date||''}','${m.id}','${m.name}')">Mark Paid</button>`}
@@ -665,7 +671,13 @@ async function loadRPayments() {
   if(!sessionId){el.innerHTML='';return;}
   const session=allSessions.find(s=>s.id===sessionId);
   try {
-    const payments=(await sGet('getPayments',{date:session?.date||''})).filter(p=>p.sessionId===sessionId);
+    // Always fetch fresh members and payments
+    const [members, allPay] = await Promise.all([
+      sGet('getMembers'),
+      sGet('getPayments',{date:session?.date||''})
+    ]);
+    allMembers = members; fillMemberSelects();
+    const payments=allPay.filter(p=>p.sessionId===sessionId);
     const ids=new Set(payments.map(p=>p.memberId));
     el.innerHTML=`
       <div class="stats-summary">

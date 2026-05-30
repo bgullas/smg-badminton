@@ -14,11 +14,13 @@
   --r:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+/* position:fixed on html+body is the only reliable iOS Safari fix for horizontal drift */
+html{position:fixed;width:100%;height:100%;overflow:hidden}
+body{position:fixed;width:100%;height:100%;overflow:hidden;font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px}
 .hidden{display:none!important}
 
 /* ── LOGIN ── */
-#login-screen{min-height:100dvh;display:flex;flex-direction:column;background:linear-gradient(160deg,#0f1f40 0%,#1A56DB 100%)}
+#login-screen{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;background:linear-gradient(160deg,#0f1f40 0%,#1A56DB 100%);overflow-y:auto}
 .login-top{flex:1;min-height:80px}
 .login-card{background:#fff;border-radius:28px 28px 0 0;padding:32px 24px calc(32px + var(--safe-bot));animation:slideUp .3s ease}
 .login-brand{text-align:center;margin-bottom:28px}
@@ -33,7 +35,7 @@ html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-fam
 #login-error{color:var(--red);font-size:13px;text-align:center;margin-top:10px;min-height:18px}
 
 /* ── APP SHELL ── */
-#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden}
 .safe-top{height:var(--safe-top);background:var(--blue);flex-shrink:0}
 
 /* ── HEADER ── */
@@ -43,7 +45,7 @@ html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-fam
 .hdr-btn:active{background:rgba(255,255,255,.3)}
 
 /* ── PAGES ── */
-.pages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(var(--bnav-h) + var(--safe-bot) + 20px)}
+.pages{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px calc(var(--bnav-h) + var(--safe-bot) + 20px)}
 .pg{animation:fadeSlide .2s ease}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -225,12 +227,11 @@ html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;font-fam
 .list-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
 
 /* ── BOTTOM NAV ── */
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;padding-bottom:var(--safe-bot);z-index:100;overflow-x:auto;scrollbar-width:none}
-.bnav::-webkit-scrollbar{display:none}
-.ntab{flex:1;min-width:60px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 4px 0;transition:transform .1s;color:var(--muted)}
+.bnav{position:fixed;bottom:0;left:0;right:0;width:100%;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;padding-bottom:var(--safe-bot);z-index:100;overflow:hidden}
+.ntab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 2px 0;transition:transform .1s;color:var(--muted)}
 .ntab:active{transform:scale(.9)}
-.nico{width:24px;height:24px;stroke:var(--muted);transition:stroke .15s}
-.ntab span{font-size:10px;font-weight:600;color:var(--muted);transition:color .15s;white-space:nowrap}
+.nico{width:24px;height:24px;stroke:var(--muted);flex-shrink:0;transition:stroke .15s}
+.ntab span{font-size:10px;font-weight:600;color:var(--muted);transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ntab.active .nico{stroke:var(--blue)}
 .ntab.active span{color:var(--blue);font-weight:700}
 
@@ -265,12 +266,7 @@ select.sel,select.finput{cursor:pointer}
 .itab-content{display:none}
 .itab-content.active-tab{display:block}
 
-/* ── NAV FIX — even 5/6 tabs, no overflow ── */
-.bnav{overflow-x:hidden}
-.ntab{min-width:0;flex:1}
-.ntab span{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-
 /* ── WIDTH FIX ── */
-html,body,#app,.pages,.pg{width:100%;max-width:100vw;overflow-x:hidden}
+.pg,.pages{width:100%;max-width:100%}
 .field-row{flex-wrap:wrap}
 .field-row .field-block{min-width:120px}
