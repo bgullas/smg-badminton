@@ -1,5 +1,5 @@
 // ── CONFIG — replace with your Apps Script URL after deploying Code.gs ──
-const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKp-WuYBJP4qUTKNSX9Mc9hycSebigwXcbqGKNt4mfRBfnPxuZSWQ2JX5wams76_oozQ/exec';
 
 // ── STATE ────────────────────────────────────────────────────────────────
 let currentUser = null, currentPage = 'home', pageStack = [];
