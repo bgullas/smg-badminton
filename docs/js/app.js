@@ -257,7 +257,9 @@ async function loadMembers() {
 }
 function renderMembers() {
   const q=document.getElementById('member-search').value.toLowerCase();
-  const filtered=allMembers.filter(m=>m.name.toLowerCase().includes(q)||(m.phone||'').includes(q));
+  const filtered=allMembers
+    .filter(m=>m.name.toLowerCase().includes(q)||(m.phone||'').includes(q))
+    .sort((a,b)=>a.name.localeCompare(b.name));
   const el=document.getElementById('members-list');
   const colors=['#1A56DB','#059669','#D97706','#7C3AED','#DB2777','#0D9488'];
   el.innerHTML=filtered.length?filtered.map((m,i)=>`
@@ -288,6 +290,10 @@ async function addMember() {
     allMembers.push(m); renderMembers(); fillMemberSelects();
     closeSheet('sheet-member');
     document.getElementById('m-name').value=''; document.getElementById('m-phone').value='';
+    // Keep the + button and inline Add button visible for adding more members
+    document.getElementById('hdr-plus').classList.remove('hidden');
+    const addBtn = document.getElementById('add-member-btn');
+    if (addBtn) addBtn.style.display = '';
     toast('Member added ✓','success');
   } catch(e) { toast(e.message,'error'); }
 }
