@@ -1,6 +1,26 @@
 // ── CONFIG — replace with your Apps Script URL after deploying Code.gs ──
 const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
 
+// ── SETUP CHECK ──────────────────────────────────────────────────────────
+function isConfigured() {
+  return SCRIPT_URL && !SCRIPT_URL.includes('YOUR_APPS_SCRIPT');
+}
+function notConfiguredMsg() {
+  return `<div style="margin:24px 0;background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:14px;padding:20px;text-align:center">
+    <div style="font-size:36px;margin-bottom:10px">⚙️</div>
+    <div style="font-weight:800;font-size:16px;color:#92400E;margin-bottom:8px">Google Apps Script Not Connected</div>
+    <div style="font-size:13px;color:#78350F;line-height:1.6">
+      The app backend is not set up yet.<br>
+      Please follow the setup steps to connect Google Sheets.
+    </div>
+    <a href="https://github.com/bgullas/smg-badminton/blob/main/appsscript/Code.gs"
+       target="_blank"
+       style="display:inline-block;margin-top:14px;background:#F59E0B;color:#fff;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none">
+      View Setup Guide →
+    </a>
+  </div>`;
+}
+
 // ── STATE ────────────────────────────────────────────────────────────────
 let currentUser = null, currentPage = 'home', pageStack = [];
 let allMembers = [], allSessions = [], courtCount = 2;
@@ -16,6 +36,7 @@ const SUB_PAGES = ['ratt','rbook','rresults','rplayers','rteams','rpayments'];
 
 // ── APPS SCRIPT API ──────────────────────────────────────────────────────
 async function sGet(action, params={}) {
+  if (!isConfigured()) throw new Error('NOT_CONFIGURED');
   const url = new URL(SCRIPT_URL);
   url.searchParams.set('action', action);
   url.searchParams.set('token', currentUser.token);
@@ -24,6 +45,7 @@ async function sGet(action, params={}) {
   if (d.error) throw new Error(d.error); return d;
 }
 async function sPost(action, body={}) {
+  if (!isConfigured()) throw new Error('NOT_CONFIGURED');
   const r = await fetch(SCRIPT_URL, {method:'POST', headers:{'Content-Type':'text/plain'},
     body: JSON.stringify({action, token: currentUser.token, ...body})});
   const d = await r.json(); if (d.error) throw new Error(d.error); return d;
@@ -144,6 +166,11 @@ async function loadHome() {
   document.getElementById('home-role').textContent = currentUser.role==='admin'?'Administrator':'Club Member';
   document.getElementById('home-date').textContent = now.toLocaleDateString('en-SG',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
+  // Show setup warning on home if not configured
+  if (!isConfigured()) {
+    document.getElementById('next-session-card').innerHTML = notConfiguredMsg();
+  }
+
   // Icon grid
   const isAdmin = currentUser.role==='admin';
   const grid = [
@@ -196,6 +223,7 @@ async function loadHome() {
 
 // ── MEMBERS ───────────────────────────────────────────────────────────────
 async function loadMembers() {
+  if (!isConfigured()) { document.getElementById('members-list').innerHTML = notConfiguredMsg(); return; }
   try { allMembers=await sGet('getMembers'); fillMemberSelects(); renderMembers(); }
   catch(e) { toast(e.message,'error'); }
 }
@@ -247,6 +275,7 @@ async function delMember(id,name) {
 // ── SESSIONS ──────────────────────────────────────────────────────────────
 function parseCourts(raw) { try{return JSON.parse(raw).filter(Boolean);}catch{return [raw].filter(Boolean);} }
 async function loadSessions() {
+  if (!isConfigured()) { document.getElementById('sessions-list').innerHTML = notConfiguredMsg(); return; }
   try { allSessions=await sGet('getSessions'); fillSessionSelects(); renderSessions(); }
   catch(e) { toast(e.message,'error'); }
 }
@@ -316,6 +345,7 @@ async function delSession(id) {
 async function loadGames() {
   const sessionId=document.getElementById('games-session-sel').value;
   const el=document.getElementById('games-list');
+  if (!isConfigured()) { el.innerHTML = notConfiguredMsg(); return; }
   if(!sessionId){ el.innerHTML=`<div class="empty"><div class="empty-icon">🏆</div><p>Select a session above</p></div>`; return; }
   try { renderGames(await sGet('getGames',{sessionId})); }
   catch(e) { toast(e.message,'error'); }
